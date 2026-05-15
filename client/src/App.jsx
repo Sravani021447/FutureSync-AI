@@ -115,8 +115,6 @@ const styles = `
   .footer-bottom { text-align: center; padding: 1.5rem; color: var(--gray); font-size: 0.8rem; border-top: 1px solid #e5e5e5; margin-top: 2.5rem; }
   .spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .db-badge { position: fixed; bottom: 1rem; right: 1rem; background: #22c55e; color: white; padding: 0.4rem 0.9rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; z-index: 9999; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-  .db-badge.error { background: #ef4444; }
   @media (max-width: 768px) {
     .hero { flex-direction: column; padding: 6rem 1.5rem 3rem; text-align: center; }
     .hero-left { text-align: center; }
@@ -326,7 +324,6 @@ function Footer() {
 export default function App() {
   const [data, setData] = useState({ testimonials: [], features: [], companies: mockDB.companies });
   const [loading, setLoading] = useState(true);
-  const [dbStatus, setDbStatus] = useState("connecting");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -340,10 +337,8 @@ export default function App() {
           features,
           companies: mockDB.companies,
         });
-        setDbStatus("connected");
       } catch (err) {
         console.error("Failed to fetch from database:", err);
-        setDbStatus("error");
       } finally {
         setLoading(false);
       }
