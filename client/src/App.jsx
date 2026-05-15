@@ -361,12 +361,6 @@ export default function App() {
       <Testimonials testimonials={data.testimonials} loading={loading} />
       <Newsletter />
       <Footer />
-      {/* Database status badge — bottom right corner */}
-      <div className={`db-badge ${dbStatus === "error" ? "error" : ""}`}>
-        {dbStatus === "connecting" && "⏳ Connecting to DB..."}
-        {dbStatus === "connected" && "🟢 MongoDB Connected"}
-        {dbStatus === "error" && "🔴 DB Error"}
-      </div>
     </>
   );
 }
