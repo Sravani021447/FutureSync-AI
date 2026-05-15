@@ -15,7 +15,7 @@ const mockDB = {
 // ============================================================
 // REAL API — connects to your Express + MongoDB backend
 // ============================================================
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = "https://futuresync-ai.onrender.com/api";
 
 const api = {
   getTestimonials: () => fetch(`${API_BASE}/testimonials`).then(r => r.json()),
@@ -315,7 +315,7 @@ function Footer() {
           ))}
         </div>
       </div>
-      <div className="footer-bottom">© 2025–Present FutureSync AI · All rights reserved.</div>
+      <div className="footer-bottom">© 2026–Present FutureSync AI · All rights reserved.</div>
     </footer>
   );
 }
