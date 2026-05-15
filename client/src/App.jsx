@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
+import Login from "./Login";
+import Register from "./Register";
+import Dashboard from "./Dashboard";
 
-// ============================================================
-// MOCK DATA (only for companies — rest comes from database)
-// ============================================================
 const mockDB = {
   companies: [
     { id: 1, name: "Foxconn", icon: "🏗️" },
@@ -12,9 +13,6 @@ const mockDB = {
   ],
 };
 
-// ============================================================
-// REAL API — connects to your Express + MongoDB backend
-// ============================================================
 const API_BASE = "https://futuresync-ai.onrender.com/api";
 
 const api = {
@@ -28,9 +26,6 @@ const api = {
     }).then(r => r.json()),
 };
 
-// ============================================================
-// STYLES
-// ============================================================
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
   :root { --primary: #6366f1; --accent: #3f83f8; --text: #1a1a2e; --gray: #808080; --light-gray: #f0f0f0; --white: #ffffff; --dark-gray: #555; }
@@ -42,10 +37,13 @@ const styles = `
   .navbar-links { display: flex; gap: 2rem; list-style: none; }
   .navbar-links a { color: #718096; font-weight: 500; font-size: 0.95rem; text-decoration: none; transition: color 0.2s; }
   .navbar-links a:hover { color: var(--primary); }
-  .btn-primary { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 0.6rem 1.4rem; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+  .navbar-right { display: flex; gap: 0.75rem; align-items: center; }
+  .btn-primary { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 0.6rem 1.4rem; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; text-decoration: none; }
   .btn-primary:hover { background: #5254f8; transform: translateY(-1px); }
-  .btn-secondary { background: var(--dark-gray); color: white; border: none; border-radius: 8px; padding: 0.6rem 1.4rem; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+  .btn-secondary { background: var(--dark-gray); color: white; border: none; border-radius: 8px; padding: 0.6rem 1.4rem; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; text-decoration: none; }
   .btn-secondary:hover { background: var(--gray); }
+  .btn-outline { background: transparent; color: var(--primary); border: 2px solid var(--primary); border-radius: 8px; padding: 0.5rem 1.2rem; font-size: 0.9rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; transition: all 0.2s; }
+  .btn-outline:hover { background: var(--primary); color: white; }
   .hero { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 3rem; padding: 7rem 4rem 4rem; min-height: 100vh; }
   .hero-left { flex: 1; text-align: left; }
   .hero-label { font-size: 0.85rem; font-weight: 700; color: var(--primary); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem; background: #eef2ff; display: inline-block; padding: 0.35rem 0.85rem; border-radius: 999px; }
@@ -128,11 +126,7 @@ const styles = `
   }
 `;
 
-// ============================================================
-// COMPONENTS
-// ============================================================
-
-function Navbar() {
+function Navbar({ user, onLogout }) {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -147,7 +141,20 @@ function Navbar() {
           <li key={item}><a href={`#${item.toLowerCase()}`}>{item}</a></li>
         ))}
       </ul>
-      <button className="btn-primary">Contact Us</button>
+      <div className="navbar-right">
+        {user ? (
+          <>
+            <span style={{fontSize:"0.9rem",color:"#555",fontFamily:"sans-serif"}}>Hi, {user.name}!</span>
+            <a href="/dashboard" className="btn-outline">Dashboard</a>
+            <button className="btn-primary" onClick={onLogout}>Logout</button>
+          </>
+        ) : (
+          <>
+            <a href="/login" className="btn-outline">Login</a>
+            <a href="/register" className="btn-primary">Register</a>
+          </>
+        )}
+      </div>
     </nav>
   );
 }
@@ -160,7 +167,7 @@ function Hero() {
         <h1 className="hero-title">Seamless Learning at <span>iPhone-level</span> Speed</h1>
         <p className="hero-desc">Our advanced AI-powered platform delivers a seamless and intelligent experience designed for the future. Built with next-generation mobile technology, it helps students stay productive, organized, and ahead in their academic journey.</p>
         <div className="hero-buttons">
-          <button className="btn-primary">Start Now</button>
+          <a href="/register" className="btn-primary">Start Now</a>
           <button className="btn-secondary">Take Tour</button>
         </div>
       </div>
@@ -239,32 +246,16 @@ function Newsletter() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("idle");
   const [message, setMessage] = useState("");
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !email.includes("@")) {
-      setStatus("error");
-      setMessage("Please enter a valid email address.");
-      return;
-    }
+    if (!email || !email.includes("@")) { setStatus("error"); setMessage("Please enter a valid email address."); return; }
     setStatus("loading");
     try {
-      // REAL API CALL to backend
       const res = await api.subscribeNewsletter(email);
-      if (res.success) {
-        setStatus("success");
-        setMessage(`🎉 ${email} subscribed successfully!`);
-        setEmail("");
-      } else {
-        setStatus("error");
-        setMessage(res.error || "Something went wrong.");
-      }
-    } catch (err) {
-      setStatus("error");
-      setMessage("Cannot connect to server. Try again.");
-    }
+      if (res.success) { setStatus("success"); setMessage(`🎉 ${email} subscribed successfully!`); setEmail(""); }
+      else { setStatus("error"); setMessage(res.error || "Something went wrong."); }
+    } catch { setStatus("error"); setMessage("Cannot connect to server."); }
   };
-
   return (
     <section className="newsletter-section">
       <div className="newsletter-box">
@@ -313,17 +304,19 @@ function Footer() {
           ))}
         </div>
       </div>
-      <div className="footer-bottom">© 2026–Present FutureSync AI · All rights reserved.</div>
+      <div className="footer-bottom">© 2025–Present FutureSync AI · All rights reserved.</div>
     </footer>
   );
 }
 
-// ============================================================
-// MAIN APP — fetches REAL data from MongoDB via Express
-// ============================================================
 export default function App() {
   const [data, setData] = useState({ testimonials: [], features: [], companies: mockDB.companies });
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem("user");
+    return saved ? JSON.parse(saved) : null;
+  });
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -332,13 +325,9 @@ export default function App() {
           api.getTestimonials(),
           api.getFeatures(),
         ]);
-        setData({
-          testimonials,
-          features,
-          companies: mockDB.companies,
-        });
+        setData({ testimonials, features, companies: mockDB.companies });
       } catch (err) {
-        console.error("Failed to fetch from database:", err);
+        console.error("Failed to fetch:", err);
       } finally {
         setLoading(false);
       }
@@ -346,16 +335,39 @@ export default function App() {
     fetchData();
   }, []);
 
+  const handleLogin = (userData) => {
+    setUser(userData);
+    navigate("/dashboard");
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    navigate("/");
+  };
+
   return (
     <>
       <style>{styles}</style>
-      <Navbar />
-      <Hero />
-      <Companies companies={data.companies} />
-      <Features features={data.features} loading={loading} />
-      <Testimonials testimonials={data.testimonials} loading={loading} />
-      <Newsletter />
-      <Footer />
+      <Routes>
+        <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route path="/register" element={<Register onLogin={handleLogin} />} />
+        <Route path="/dashboard" element={
+          user ? <Dashboard user={user} onLogout={handleLogout} /> : <Login onLogin={handleLogin} />
+        } />
+        <Route path="/" element={
+          <>
+            <Navbar user={user} onLogout={handleLogout} />
+            <Hero />
+            <Companies companies={data.companies} />
+            <Features features={data.features} loading={loading} />
+            <Testimonials testimonials={data.testimonials} loading={loading} />
+            <Newsletter />
+            <Footer />
+          </>
+        } />
+      </Routes>
     </>
   );
 }
