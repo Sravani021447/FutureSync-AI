@@ -14,7 +14,6 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
@@ -63,7 +62,7 @@ const protect = (req, res, next) => {
 
 // ── AUTH ROUTES ───────────────────────────────────────────────
 
-// REGISTER
+// CREATE — Register
 app.post("/api/auth/register", async (req, res) => {
   const { name, email, password } = req.body;
   if (!name || !email || !password) {
@@ -90,7 +89,7 @@ app.post("/api/auth/register", async (req, res) => {
   }
 });
 
-// LOGIN
+// READ — Login
 app.post("/api/auth/login", async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -116,13 +115,39 @@ app.post("/api/auth/login", async (req, res) => {
   }
 });
 
-// GET PROFILE (protected)
+// READ — Get Profile
 app.get("/api/auth/profile", protect, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
     res.json({ success: true, user });
   } catch (err) {
     res.status(500).json({ error: "Server error" });
+  }
+});
+
+// UPDATE — Update Profile
+app.put("/api/auth/profile", protect, async (req, res) => {
+  const { name } = req.body;
+  if (!name) return res.status(400).json({ success: false, error: "Name required" });
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { name },
+      { new: true }
+    ).select("-password");
+    res.json({ success: true, user });
+  } catch (err) {
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+});
+
+// DELETE — Delete Account
+app.delete("/api/auth/profile", protect, async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.user.id);
+    res.json({ success: true, message: "Account deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ success: false, error: "Server error" });
   }
 });
 
@@ -186,6 +211,6 @@ app.post("/api/seed", async (req, res) => {
   }
 });
 
-// Start server
+// ── START SERVER ──────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
