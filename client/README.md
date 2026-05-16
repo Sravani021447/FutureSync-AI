@@ -1,16 +1,74 @@
-# React + Vite
+# FutureSync AI 🚀
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern Full Stack AI-powered learning platform built with the MERN stack.
 
-Currently, two official plugins are available:
+## 🌍 Live Demo
+- **Frontend:** https://future-sync-ai.vercel.app
+- **Backend API:** https://futuresync-ai.onrender.com
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 📸 Features
+- ✅ Responsive React frontend
+- ✅ User Authentication (Register/Login/Logout)
+- ✅ JWT Token based security
+- ✅ MongoDB database integration
+- ✅ Newsletter subscription
+- ✅ REST API backend
+- ✅ Deployed on Vercel + Render
 
-## React Compiler
+## 🛠️ Tech Stack
+| Frontend | Backend | Database | Deployment |
+|---|---|---|---|
+| React | Node.js | MongoDB | Vercel |
+| Vite | Express.js | Mongoose | Render |
+| React Router | JWT Auth | Atlas | GitHub |
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 📁 Project Structure
+FutureSync/
+├── client/          → React Frontend
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── Login.jsx
+│   │   ├── Register.jsx
+│   │   └── Dashboard.jsx
+└── server/          → Node.js Backend
+    └── server.js
 
-## Expanding the ESLint configuration
+## 🚀 Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Prerequisites
+- Node.js v18+
+- MongoDB
+
+### Installation
+
+Clone the repo:
+git clone https://github.com/Sravani021447/FutureSync-AI.git
+cd FutureSync-AI
+
+Install frontend:
+cd client
+npm install
+npm run dev
+
+Install backend:
+cd server
+npm install
+node server.js
+
+## 🔗 API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | /api/auth/register | Register new user |
+| POST | /api/auth/login | Login user |
+| GET | /api/auth/profile | Get user profile |
+| GET | /api/testimonials | Get all testimonials |
+| GET | /api/features | Get all features |
+| POST | /api/newsletter | Subscribe to newsletter |
+
+## 👩‍💻 Developer
+**Sravani Naspuri**
+- GitHub: [@Sravani021447](https://github.com/Sravani021447)
+
+## 📄 License
+MIT License
